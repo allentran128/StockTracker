@@ -1,0 +1,24 @@
+{
+  "name": "stock-tracker",
+  "version": "1.0.0",
+  "description": "Stock Tracking Web App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allentran128/StockTracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/allentran128/StockTracker/issues"
+  },
+  "homepage": "https://github.com/allentran128/StockTracker#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "morgan": "^1.9.0"
+  }
+}
