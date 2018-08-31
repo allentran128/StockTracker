@@ -19,6 +19,7 @@
   "homepage": "https://github.com/allentran128/StockTracker#readme",
   "dependencies": {
     "express": "^4.16.3",
-    "morgan": "^1.9.0"
+    "morgan": "^1.9.0",
+    "mysql": "^2.16.0"
   }
 }
