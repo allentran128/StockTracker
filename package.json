@@ -19,6 +19,7 @@
   "homepage": "https://github.com/allentran128/StockTracker#readme",
   "dependencies": {
     "bootstrap": "^4.1.3",
+    "cors": "^2.8.4",
     "express": "^4.16.3",
     "jquery": "^3.3.1",
     "morgan": "^1.9.0",

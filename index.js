@@ -2,8 +2,10 @@
 
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const app = express();
+
 
 const addr = process.env.ADDR || ":80";
 
@@ -15,19 +17,22 @@ var mysql = require('mysql');
 var con = mysql.createConnection({
   host: "localhost",
   user: "alltran",
-  password: "GrandDao1!"
+  password: "GrandDao1!",
+  database: "User"
 });
 
-
+// Allow all CORS requests
+app.use(cors());
 
 // add JSON request body parsing middleware
 app.use(express.json());
+
 // add the request logging middleware
 app.use(morgan("dev"));
 
 // Register
 app.post("/register", (req, res, next) => {
-    res.set("Content-Type", "text/plain");
+    //res.set("Content-Type", "text/plain");
 
     res.json(req.body);
     /*
@@ -51,9 +56,38 @@ app.post("/register", (req, res, next) => {
 
 // Log in
 app.get("/login", (req, res, next) => {
-    res.set("Content-Type", "text/plain");
+    //res.set("Content-Type", "text/plain");
 
-    res.json(req.body);
+    //res.json(req.body);
+    //res.send('Welcome!');
+    console.log(req.query);
+
+    if (typeof req.query.id !== 'undefined' && req.query.id) {
+      // FIND ENTRY IN DB
+      console.log(req.query.id);
+
+      con.connect(function(err) {
+          console.log("Connected!");
+          const user = req.query.id;
+          const sql = `SELECT * FROM userinfo WHERE username = '${user}'`;
+          console.log("Query: " + sql);
+
+          con.query(sql, function (err, result) {
+              if (err) throw err;
+              console.log("Result: ");
+              console.log(result);
+              console.log(result[0]);
+              console.log(result[1]);
+              res.send("Validating...");
+              // TODO if exists in DB, then verify password
+          });
+
+          if (err) throw err;
+      });
+    } else {
+      // ERROR
+      res.send("Error, no username detected.");
+    }
 
     /*
     con.connect(function(err) {
@@ -75,7 +109,7 @@ app.get("/login", (req, res, next) => {
 
 // Get Stock
 app.get("/stock/:name", (req, res, next) => {
-    res.set("Content-Type", "text/plain");
+    //res.set("Content-Type", "text/plain");
     // req.params.name
     /*
     con.connect(function(err) {

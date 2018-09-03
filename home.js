@@ -13,18 +13,29 @@
      * the site and the server on localhost.
      *
      */
+
+    $("#prospects_form").submit(function(e) {
+      e.preventDefault();
+    });
+
     document.getElementById("btn").onclick = function() {
       console.log("Clicked Submit Button.");
 
       const req = new XMLHttpRequest();
 
-      req.open("GET", "/login");
-      req.onload = function() {
-        const rep = JSON.parse(req.responseText);
+      req.open("GET", "http://localhost:4000/login");
+      req.setRequestHeader("Access-Control-Allow-Origin", "http://localhost");
+
+      req.onreadystatechange = function() {
+        debugger;
+        const rep = req.responseText;
+        console.log("I got a reply:");
         console.log(rep);
-      }
+
+        document.getElementById("response").innerHTML += rep;
+      };
 
       req.send();
-  }
-
+    };
+  };
 })();
