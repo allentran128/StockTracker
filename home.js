@@ -1,3 +1,11 @@
+/* LOG IN FUNCTINALITY
+ *
+ * TODO: hash passwords with SHA256
+ * TODO: have user send back a user.html page and have JS redirect there
+ *
+ *
+ */
+
 (function() {
   'use strict';
 
@@ -23,19 +31,22 @@
 
       const req = new XMLHttpRequest();
 
-      req.open("GET", "http://localhost:4000/login");
-      req.setRequestHeader("Access-Control-Allow-Origin", "http://localhost");
+      req.open("POST", "http://localhost:4000/login");
+      //req.setRequestHeader("Access-Control-Allow-Origin", "http://localhost");
 
       req.onreadystatechange = function() {
-        debugger;
         const rep = req.responseText;
         console.log("I got a reply:");
         console.log(rep);
-
-        document.getElementById("response").innerHTML += rep;
       };
 
-      req.send();
+      req.setRequestHeader("Content-Type", "application/json");
+      const user = document.getElementById("inputEmail").value;
+      const pass = document.getElementById("inputPassword").value;
+      const obj = {username: user, password: pass};
+      console.log(obj);
+      console.log("User: " + user + ", Pass: " + pass);
+      req.send(JSON.stringify(obj));
     };
   };
 })();

@@ -46,3 +46,7 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+#inputPassword1 {
+  margin-bottom: 0px;
+}

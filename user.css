@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#menu {
+  border-style: double;
+  border-width: medium;
+  flex-grow: 1;
+}
+
+#search {
+  flex-grow: 1;
+}
+
+#result {
+  border: 2px solid lightgrey;
+  border-radius: 5px;
+  flex-grow: 4;
+}
