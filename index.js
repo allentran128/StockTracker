@@ -1,11 +1,34 @@
 "use strict";
 
+const https = require("https");
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const TrieSearch = require("trie-search");
+
 
 const app = express();
+const ts = new TrieSearch("symbol"); // by symbol
+setupTrie(ts);
 
+function setupTrie(ts) {
+  // get a list of symbols from : https://api.iextrading.com/1.0/ref-data/symbols
+  // then modify that json to only have the symbols, then use trie-search's addFromObject or so to make a trie
+  https.get("https://api.iextrading.com/1.0/ref-data/symbols", (resp) => {
+    let data = '';
+
+    resp.on("data", (chunk) => {
+      data += chunk;
+    });
+
+    resp.on("end", () => {
+      ts.addAll(JSON.parse(data));
+    });
+
+  }).on("error", (err) => {
+    console.log(err);
+  });
+};
 
 const addr = process.env.ADDR || ":80";
 
@@ -109,6 +132,25 @@ app.post("/login", (req, res, next) => {
     }
 });
 
+app.get("/stock", (req, res, next) => {
+  // Make a call to the Trie-Seach to search for
+  // the query as req.query.q
+  //
+  // Return a JSON of all the suggested items
+  // as an Array
+  const query = req.query.q;
+  const suggestions = ts.get(query);
+  const result = [];
+
+  // parse suggestions to be only symbol key
+  for (var i = 0; i < suggestions.length; i++) {
+    result.push(suggestions[i].symbol);
+  }
+
+  res.set("Content-Type", "text/plain");
+  res.send(result);
+});
+
 // Get Stock
 app.get("/stock/:name", (req, res, next) => {
     //res.set("Content-Type", "text/plain");
@@ -125,7 +167,30 @@ app.get("/stock/:name", (req, res, next) => {
 
       if (err) throw err;
     */
-    res.send("Fetching... " + req.params.name);
+
+    const stock = req.params.name;
+    // verify that stock is valid
+    console.log(ts.get(stock));
+    if (ts.get(stock).length == 1) {
+      //res.send("valid...fetching... " + stock);
+      https.get(`https://api.iextrading.com/1.0/stock/${stock}/price`, (resp) => {
+        let data = '';
+
+        resp.on("data", (chunk) => {
+          data += chunk;
+        });
+
+        resp.on("end", () => {
+          res.send(data);
+        });
+
+      }).on("error", (err) => {
+        console.log(err);
+      });
+    // https://api.iextrading.com/1.0/stock/${stock}/price
+    } else {
+      res.send("invalid fetching... " + stock);
+    }
 });
 
 //start the server listening on host:port

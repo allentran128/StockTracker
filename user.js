@@ -14,3 +14,44 @@
  *
  * TODO: Implement Sessions
  */
+
+
+(function() {
+  'use strict';
+
+  window.onload = function() {
+    var name = document.getElementById("name_input");
+    name.addEventListener("keyup", function(event) {suggest(event)});
+    window.suggestXHR = new XMLHttpRequest();
+  };
+
+
+  function suggest(event) {
+    var input = event.target;
+    var huge_list = document.getElementById("huge_list");
+    var min_characters = 0;
+
+    if (input.value.length < min_characters ) {
+      return;
+    } else {
+      console.log(input);
+      // abort any pending requests
+      window.suggestXHR.abort();
+
+      window.suggestXHR.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var response = JSON.parse( this.responseText );
+          huge_list.innerHTML = "";
+          response.forEach(function(item) {
+            var option = document.createElement('option');
+            option.value = item;
+            huge_list.appendChild(option);
+          });
+        }
+      };
+
+      window.suggestXHR.open("GET", "http://localhost:4000/stock/?q=" + input.value, true);
+      window.suggestXHR.send();
+    }
+  }
+})();

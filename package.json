@@ -24,6 +24,7 @@
     "jquery": "^3.3.1",
     "morgan": "^1.9.0",
     "mysql": "^2.16.0",
-    "popper.js": "^1.14.4"
+    "popper.js": "^1.14.4",
+    "trie-search": "^1.2.8"
   }
 }
