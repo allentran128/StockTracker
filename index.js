@@ -6,12 +6,12 @@ const morgan = require("morgan");
 const cors = require("cors");
 const TrieSearch = require("trie-search");
 
-
 const app = express();
 const ts = new TrieSearch("symbol"); // by symbol
-setupTrie(ts);
+const stocks = {}; // Hashmap for validity of stock
+loadStocks(ts);
 
-function setupTrie(ts) {
+function loadStocks(ts) {
   // get a list of symbols from : https://api.iextrading.com/1.0/ref-data/symbols
   // then modify that json to only have the symbols, then use trie-search's addFromObject or so to make a trie
   https.get("https://api.iextrading.com/1.0/ref-data/symbols", (resp) => {
@@ -22,7 +22,14 @@ function setupTrie(ts) {
     });
 
     resp.on("end", () => {
-      ts.addAll(JSON.parse(data));
+      const parsedData = JSON.parse(data);
+      ts.addAll(parsedData);
+
+      for (const i in parsedData) {
+        stocks[(parsedData[i]["symbol"])] = true;
+      }
+      stocks["ZN"] != undefined && stocks["ZN"]
+      console.log(stocks["ZNXX"] != undefined && stocks["ZNXX"]);
     });
 
   }).on("error", (err) => {
@@ -45,6 +52,7 @@ var con = mysql.createConnection({
 });
 
 // Allow all CORS requests
+// TODO bad for security ?
 app.use(cors());
 
 // add JSON request body parsing middleware
@@ -53,10 +61,14 @@ app.use(express.json());
 // add the request logging middleware
 app.use(morgan("dev"));
 
-// Initial connect
+// Initial connect for 'User' database
 con.connect();
 
-// Register
+/* Registers a email/pass if not in database
+ *
+ * On success, redirect to user.html
+ * On fail, notify user that email is taken
+ */
 app.post("/register", (req, res, next) => {
     console.log("Registering...");
     console.log(req.body);
@@ -98,7 +110,11 @@ app.post("/register", (req, res, next) => {
     }
 });
 
-// Log in
+/* Validates email/pass against database
+ *
+ * TODO: should redirect on success/fail
+ *  so pass plain text that will be passed onto "windows.location.replace = 'url'"
+ */
 app.post("/login", (req, res, next) => {
     //res.set("Content-Type", "text/plain");
 
@@ -132,14 +148,24 @@ app.post("/login", (req, res, next) => {
     }
 });
 
-app.get("/search", (req, res, next) => {
+/* Validates if the query is a valid stock name
+ *
+ * Returns "Valid" if valid, else "Invalid"
+ */
+app.get("/verify", (req, res, next) => {
   const stock = req.query.name;
-  console.log("FORM: stock = " + stock);
-
   res.set("Content-Type", "text/plain");
-  res.send(stock);
+  if (stocks[stock] != undefined && stocks[stock]) {
+    res.send("Valid");
+  } else {
+    res.send("Invalid");
+  }
 });
 
+/* Fetches the stocks with matching prefix of the query
+ *
+ * Returns a list of stocks
+ */
 app.get("/stock", (req, res, next) => {
   // Make a call to the Trie-Seach to search for
   // the query as req.query.q
@@ -159,22 +185,11 @@ app.get("/stock", (req, res, next) => {
   res.send(result);
 });
 
-// Get Stock
+/* Given a valid stock name, fetch data from the API
+ * TODO: diff variations, (chart, news, basic info)
+ * For now, returns the current (closing) price of stock
+ */
 app.get("/stock/:name", (req, res, next) => {
-    //res.set("Content-Type", "text/plain");
-    // req.params.name
-    /*
-    con.connect(function(err) {
-      console.log("Connected!");
-      const sql = 'SELECT * FROM ${name}'; // maybe limit to top 50 res?
-      con.query(sql, function(err, result) {
-        if (err) throw err;
-        console.log("Result: " + result);
-        res.send(result);
-      });
-
-      if (err) throw err;
-    */
 
     const stock = req.params.name;
     // verify that stock is valid
@@ -201,8 +216,7 @@ app.get("/stock/:name", (req, res, next) => {
     }
 });
 
-//start the server listening on host:port
+// start the server listening on host:port
 app.listen(port, host, () => {
-    //callback is executed once server is listening
     console.log(`server is listening at http://${addr}...`);
 });
