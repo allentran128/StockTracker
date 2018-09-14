@@ -13,6 +13,8 @@
  *  Log out: redirect to the home page (end session)
  *
  * TODO: Implement Sessions
+ * TODO: Figure out forms, to get search query
+ *        for now, use btn click to envoke javascript
  */
 
 
@@ -22,6 +24,13 @@
   window.onload = function() {
     var name = document.getElementById("name_input");
     name.addEventListener("keyup", function(event) {suggest(event)});
+
+    var btn = document.getElementById("btn");
+    btn.addEventListener("click", () => {
+      // Verify the stock name (not null, etc)
+      console.log("Verifying..." + name.value);
+    });
+
     window.suggestXHR = new XMLHttpRequest();
   };
 
