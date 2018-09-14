@@ -19,3 +19,16 @@
   border-radius: 5px;
   flex-grow: 4;
 }
+
+#menu-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+}
+
+#search-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
