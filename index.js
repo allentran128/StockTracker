@@ -132,6 +132,14 @@ app.post("/login", (req, res, next) => {
     }
 });
 
+app.get("/search", (req, res, next) => {
+  const stock = req.query.name;
+  console.log("FORM: stock = " + stock);
+
+  res.set("Content-Type", "text/plain");
+  res.send(stock);
+});
+
 app.get("/stock", (req, res, next) => {
   // Make a call to the Trie-Seach to search for
   // the query as req.query.q
