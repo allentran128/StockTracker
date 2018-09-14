@@ -22,23 +22,29 @@
 
     <div class="container">
         <div class="row" id="menu">
-            <div class="col">
-                MENU
+            <div class="col" id="menu-bar">
+                <div>Menu</div>
+                <div>My Stocks</div>
+                <div>Logout</div>
             </div>
         </div>
 
         <div class="row" id="search">
             <!-- Search form -->
-            <input class="form-control" type="text"
-            placeholder="Search" aria-label="Search"
-            list="huge_list" name="name" id="name_input">
+            <div id="search-bar">
+                <div>
+                    <input class="form-control" type="search"
+                    placeholder="Search" aria-label="Search"
+                    list="huge_list" id="name_input">
 
-            <datalist id="huge_list">
-            </datalist>
+                    <datalist id="huge_list">
+                    </datalist>
+                </div>
 
-            </br>
-
-            <input type="submit">
+                <div>
+                    <button class="btn" id="btn">Search</button>
+                </div>
+            </div>
         </div>
 
         <div class="row" id="result">
