@@ -28,8 +28,6 @@ function loadStocks(ts) {
       for (const i in parsedData) {
         stocks[(parsedData[i]["symbol"])] = true;
       }
-      stocks["ZN"] != undefined && stocks["ZN"]
-      console.log(stocks["ZNXX"] != undefined && stocks["ZNXX"]);
     });
 
   }).on("error", (err) => {
@@ -52,7 +50,7 @@ var con = mysql.createConnection({
 });
 
 // Allow all CORS requests
-// TODO bad for security ?
+// TODO remove later
 app.use(cors());
 
 // add JSON request body parsing middleware
@@ -66,7 +64,7 @@ con.connect();
 
 /* Registers a email/pass if not in database
  *
- * On success, redirect to user.html
+ * On success, notify JS that it is okay to proceed (JS will redirect to user.html)
  * On fail, notify user that email is taken
  */
 app.post("/register", (req, res, next) => {
@@ -99,7 +97,6 @@ app.post("/register", (req, res, next) => {
             res.send("Register Success");
 
           });
-          // TODO, redirect to a new user.html page
         } else {
           // Bad, username already in use
           res.send("Username / Email taken.");
@@ -113,7 +110,9 @@ app.post("/register", (req, res, next) => {
 /* Validates email/pass against database
  *
  * TODO: should redirect on success/fail
- *  so pass plain text that will be passed onto "windows.location.replace = 'url'"
+ *  notify JS on success to "windows.location.replace = 'url'"
+ *
+ *  else produce a login failed message
  */
 app.post("/login", (req, res, next) => {
     //res.set("Content-Type", "text/plain");
@@ -190,30 +189,22 @@ app.get("/stock", (req, res, next) => {
  * For now, returns the current (closing) price of stock
  */
 app.get("/stock/:name", (req, res, next) => {
-
     const stock = req.params.name;
-    // verify that stock is valid
-    console.log(ts.get(stock));
-    if (ts.get(stock).length == 1) {
-      //res.send("valid...fetching... " + stock);
-      https.get(`https://api.iextrading.com/1.0/stock/${stock}/price`, (resp) => {
-        let data = '';
+    https.get(`https://api.iextrading.com/1.0/stock/${stock}/price`, (resp) => {
+      let data = '';
 
-        resp.on("data", (chunk) => {
-          data += chunk;
-        });
-
-        resp.on("end", () => {
-          res.send(data);
-        });
-
-      }).on("error", (err) => {
-        console.log(err);
+      resp.on("data", (chunk) => {
+        data += chunk;
       });
-    // https://api.iextrading.com/1.0/stock/${stock}/price
-    } else {
-      res.send("invalid fetching... " + stock);
-    }
+
+      resp.on("end", () => {
+        res.send(data);
+      });
+
+    }).on("error", (err) => {
+      console.log(err);
+      res.send("Error, try again");
+    });
 });
 
 // start the server listening on host:port
