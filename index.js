@@ -184,6 +184,32 @@ app.get("/stock", (req, res, next) => {
   res.send(result);
 });
 
+/* Given a valid stock name, fetch data from API of the
+ * company info
+ *
+ * basic info
+ *
+ */
+app.get("/stock/info/:name", (req, res, next) => {
+    const stock = req.params.name;
+    https.get(`https://api.iextrading.com/1.0/stock/${stock}/company`, (resp) => {
+      let data = '';
+
+      resp.on("data", (chunk) => {
+        data += chunk;
+      });
+
+      resp.on("end", () => {
+        res.json(data);
+      });
+
+    }).on("error", (err) => {
+      console.log(err);
+      res.send("Error, try again");
+    });
+});
+
+
 /* Given a valid stock name, fetch data from the API
  * TODO: diff variations, (chart, news, basic info)
  * For now, returns the current (closing) price of stock
