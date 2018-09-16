@@ -25,7 +25,7 @@
     window.suggestXHR = new XMLHttpRequest();
     window.verifyXHR = new XMLHttpRequest();
     window.fetchXHR = new XMLHttpRequest();
-    window.resBox = document.getElementById("results");
+    window.resBox = document.getElementById("price");
 
     var name = document.getElementById("name_input");
     name.addEventListener("keyup", (event) => {suggest(event)});
@@ -37,6 +37,38 @@
     });
   };
 
+  /* Fetches the stock info and displays it
+   * into results div
+   *
+   * TODO: check if there are missing values
+   *  ie CEO
+   *  and dont display them
+   */
+  function fetchStockInfo(stock) {
+    console.log("Fetching..." + stock);
+
+    window.fetchXHR.abort();
+    window.fetchXHR.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        var response = JSON.parse(this.responseText);
+        console.log("Response from fetch: " + response);
+        response = JSON.parse(response);
+        document.getElementById("stock_name").innerHTML = response["symbol"];
+        document.getElementById("industry").innerHTML = "Industry: " + response["industry"];
+        document.getElementById("ceo").innerHTML = "CEO: " + response["CEO"];
+        document.getElementById("url").setAttribute("href", response["website"]);
+        document.getElementById("url").innerHTML = response["website"];
+        document.getElementById("desc").innerHTML = response["description"];
+
+        console.log("finished loading info");
+        fetchStockPrice(stock);
+      }
+    };
+
+    window.fetchXHR.open("GET", "http://localhost:4000/stock/info/" + stock, true);
+    window.fetchXHR.send();
+
+  }
 
 
   /* Given a string {stock}
@@ -52,7 +84,7 @@
         var response = this.responseText;
         console.log("Response from Verify: " + response);
         if(response == "Valid") {
-          fetchStockPrice(stock);
+          fetchStockInfo(stock);
         }
       }
     };
@@ -71,7 +103,7 @@
       if (this.readyState == 4 && this.status == 200) {
         var response = this.responseText;
         console.log("Price of " + stock + " is " + response);
-        window.resBox.innerHTML = "Price of " + stock + " is " + response;
+        window.resBox.innerHTML = "$" + response;
       }
     };
 
