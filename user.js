@@ -22,19 +22,66 @@
   'use strict';
 
   window.onload = function() {
+    window.suggestXHR = new XMLHttpRequest();
+    window.verifyXHR = new XMLHttpRequest();
+    window.fetchXHR = new XMLHttpRequest();
+    window.resBox = document.getElementById("results");
+
     var name = document.getElementById("name_input");
-    name.addEventListener("keyup", function(event) {suggest(event)});
+    name.addEventListener("keyup", (event) => {suggest(event)});
 
     var btn = document.getElementById("btn");
     btn.addEventListener("click", () => {
-      // Verify the stock name (not null, etc)
-      console.log("Verifying..." + name.value);
+      const stock = document.getElementById("name_input").value;
+      verifyStock(stock);
     });
-
-    window.suggestXHR = new XMLHttpRequest();
   };
 
 
+
+  /* Given a string {stock}
+   * verify if that string is a valid
+   * stock symbol
+   */
+  function verifyStock(stock) {
+    console.log("Verifying..." + stock);
+
+    window.verifyXHR.abort();
+    window.verifyXHR.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        var response = this.responseText;
+        console.log("Response from Verify: " + response);
+        if(response == "Valid") {
+          fetchStockPrice(stock);
+        }
+      }
+    };
+
+    window.verifyXHR.open("GET", "http://localhost:4000/verify?name=" + stock, true);
+    window.verifyXHR.send();
+  }
+
+  /* Given a valid stock name
+   * fetch the current price of the stock
+   * and display it in the results section
+   */
+  function fetchStockPrice(stock) {
+    window.fetchXHR.abort();
+    window.fetchXHR.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var response = this.responseText;
+        console.log("Price of " + stock + " is " + response);
+        window.resBox.innerHTML = "Price of " + stock + " is " + response;
+      }
+    };
+
+    window.fetchXHR.open("GET", "http://localhost:4000/stock/" + stock, true);
+    window.fetchXHR.send();
+  }
+
+  /* Given a query from search box, returns a list
+   * of stock symbols whom's suffix matches the query
+   */
   function suggest(event) {
     var input = event.target;
     var huge_list = document.getElementById("huge_list");
@@ -44,12 +91,11 @@
       return;
     } else {
       console.log(input);
-      // abort any pending requests
       window.suggestXHR.abort();
 
       window.suggestXHR.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-          var response = JSON.parse( this.responseText );
+          var response = JSON.parse(this.responseText);
           huge_list.innerHTML = "";
           response.forEach(function(item) {
             var option = document.createElement('option');
