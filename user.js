@@ -15,6 +15,9 @@
  * TODO: Implement Sessions
  * TODO: Figure out forms, to get search query
  *        for now, use btn click to envoke javascript
+ * TODO: Figure out whether to chain events or load in parallel
+ *        right now, its very ugly style
+ *        find "NEXT"
  */
 
 
@@ -24,7 +27,9 @@
   window.onload = function() {
     window.suggestXHR = new XMLHttpRequest();
     window.verifyXHR = new XMLHttpRequest();
-    window.fetchXHR = new XMLHttpRequest();
+    window.fetchPriceXHR = new XMLHttpRequest();
+    window.fetchInfoXHR = new XMLHttpRequest();
+    window.fetchNewsXHR = new XMLHttpRequest();
     window.resBox = document.getElementById("price");
 
     var name = document.getElementById("name_input");
@@ -35,14 +40,39 @@
       const stock = document.getElementById("name_input").value;
       verifyStock(stock);
     });
-
-    //loadChart();
   };
 
+  function fetchStockNews(stock) {
+    console.log("Fetching news");
 
-  function reject(err) {
-    // just log the error
-    console.log(err);
+    // Clear
+    document.getElementById("news").innerHTML = "";
+
+    var header = document.createElement('h2');
+    header.innerHTML = "Most Recent News";
+    document.getElementById("news").appendChild(header);
+
+    window.fetchNewsXHR.abort();
+    window.fetchNewsXHR.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var response = JSON.parse(this.responseText);
+        for (var i in response) {
+          var article = response[i];
+          var title = article["headline"] + `(${article["source"]})`;
+          var link = document.createElement('a');
+          link.setAttribute("href", article["url"]);
+          link.innerHTML = title;
+          document.getElementById("news").appendChild(link);
+          console.log(i + ":" + title);
+
+          var br = document.createElement('br');
+          document.getElementById("news").appendChild(br);
+        }
+      }
+    };
+
+    window.fetchNewsXHR.open("GET",`https://api.iextrading.com/1.0/stock/${stock}/news/`);
+    window.fetchNewsXHR.send();
   }
 
   /* Data is JSON obj
@@ -63,6 +93,7 @@
     console.log("labels: " + labels);
     console.log("prices: " + prices);
 
+    // NEXT
     graphChartData({"labels":labels, "prices":prices});
   }
 
@@ -97,34 +128,29 @@
   function loadChart(stock) {
     console.log("loading chart");
 
-    console.log("starting promise");
     const xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         var response = JSON.parse(this.responseText);
+        // NEXT
         parseChartData(response);
       }
     };
 
     xhr.open("GET",`https://api.iextrading.com/1.0/stock/${stock}/chart/1m/`);
-    xhr.onerror = reject(xhr.statusText);
     xhr.send();
   }
 
 
   /* Fetches the stock info and displays it
    * into results div
-   *
-   * TODO: check if there are missing values
-   *  ie CEO
-   *  and dont display them
    */
   function fetchStockInfo(stock) {
     console.log("Fetching..." + stock);
 
-    window.fetchXHR.abort();
-    window.fetchXHR.onreadystatechange = function () {
+    window.fetchInfoXHR.abort();
+    window.fetchInfoXHR.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         var response = JSON.parse(this.responseText);
         console.log("Response from fetch: " + response);
@@ -150,15 +176,13 @@
         document.getElementById("desc").innerHTML = response["description"];
 
         console.log("finished loading info");
-        fetchStockPrice(stock);
       }
     };
 
-    window.fetchXHR.open("GET", "http://localhost:4000/stock/info/" + stock, true);
-    window.fetchXHR.send();
+    window.fetchInfoXHR.open("GET", "http://localhost:4000/stock/info/" + stock, true);
+    window.fetchInfoXHR.send();
 
   }
-
 
   /* Given a string {stock}
    * verify if that string is a valid
@@ -173,7 +197,11 @@
         var response = this.responseText;
         console.log("Response from Verify: " + response);
         if(response == "Valid") {
+          // NEXT
           fetchStockInfo(stock);
+          fetchStockPrice(stock);
+          loadChart(stock);
+          fetchStockNews(stock);
         }
       }
     };
@@ -187,19 +215,17 @@
    * and display it in the results section
    */
   function fetchStockPrice(stock) {
-    window.fetchXHR.abort();
-    window.fetchXHR.onreadystatechange = function() {
+    window.fetchPriceXHR.abort();
+    window.fetchPriceXHR.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         var response = this.responseText;
         console.log("Price of " + stock + " is " + response);
         window.resBox.innerHTML = "$" + response;
-
-        loadChart(stock);
       }
     };
 
-    window.fetchXHR.open("GET", "http://localhost:4000/stock/" + stock, true);
-    window.fetchXHR.send();
+    window.fetchPriceXHR.open("GET", "http://localhost:4000/stock/" + stock, true);
+    window.fetchPriceXHR.send();
   }
 
   /* Given a query from search box, returns a list
