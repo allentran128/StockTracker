@@ -5,8 +5,19 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const TrieSearch = require("trie-search");
+const session = require('express-session');
 
 const app = express();
+app.use(session({
+  secret: 'access from environment',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false // TODO change to true for production
+  }
+});
+
+// Setup Search Bar
 const ts = new TrieSearch("symbol"); // by symbol
 const stocks = {}; // Hashmap for validity of stock
 loadStocks(ts);
@@ -45,13 +56,12 @@ var mysql = require('mysql');
 var con = mysql.createConnection({
   host: "localhost",
   user: "alltran",
-  password: "GrandDao1!",
+  password: "GrandDao1!", // TODO use environment var to look up password!
   database: "User"
 });
 
 // Allow all CORS requests
-// TODO remove later
-app.use(cors());
+app.use(cors()); // TODO remove later during production
 
 // add JSON request body parsing middleware
 app.use(express.json());
@@ -135,7 +145,11 @@ app.post("/login", (req, res, next) => {
 
         if (result[0].password == req.body.password) {
           console.log("Matching passwords");
-          res.send("Login Success!");
+
+          // ACTIVATE SESSION
+          req.session.userId = user;
+
+          res.send("Login Success!" + "Welcome " + req.session.userId);
         } else {
           console.log("Attempt: " + req.body.password + " vs " + result[0].password);
           res.send("Login Failed. Wrong Password!");
@@ -211,7 +225,6 @@ app.get("/stock/info/:name", (req, res, next) => {
 
 
 /* Given a valid stock name, fetch data from the API
- * TODO: diff variations, (chart, news, basic info)
  * For now, returns the current (closing) price of stock
  */
 app.get("/stock/:name", (req, res, next) => {
