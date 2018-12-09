@@ -47,7 +47,6 @@ const addr = process.env.ADDR || ":80";
 
 const [host, port] = addr.split(":");
 
-
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
@@ -68,19 +67,6 @@ app.use(morgan("dev"));
 
 // Initial connect for 'User' database
 con.connect();
-
-app.use(function(req, res, next) {
-  if (!req.session.views) {
-    req.session.views = 0
-  }
-
-  req.session.views = req.session.views + 1
-
-  console.log("uid: " + req.sessionID + ", views: " + req.session.views)
-
-  next()
-});
-
 
 /* Registers a email/pass if not in database
  *
