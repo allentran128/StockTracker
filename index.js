@@ -11,11 +11,8 @@ const app = express();
 app.use(session({
   secret: 'access from environment',
   resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false // TODO change to true for production
-  }
-});
+  saveUninitialized: true
+}));
 
 // Setup Search Bar
 const ts = new TrieSearch("symbol"); // by symbol
@@ -71,6 +68,19 @@ app.use(morgan("dev"));
 
 // Initial connect for 'User' database
 con.connect();
+
+app.use(function(req, res, next) {
+  if (!req.session.views) {
+    req.session.views = 0
+  }
+
+  req.session.views = req.session.views + 1
+
+  console.log("uid: " + req.sessionID + ", views: " + req.session.views)
+
+  next()
+});
+
 
 /* Registers a email/pass if not in database
  *
@@ -146,10 +156,15 @@ app.post("/login", (req, res, next) => {
         if (result[0].password == req.body.password) {
           console.log("Matching passwords");
 
-          // ACTIVATE SESSION
-          req.session.userId = user;
+          if (!req.session.loginCount) {
+            req.session.loginCount = 0;
+          }
+          req.session.loginCount += 1;
 
-          res.send("Login Success!" + "Welcome " + req.session.userId);
+          // ACTIVATE SESSION
+          console.log("Login Success! " + user + ", login count is " + req.session.loginCount);
+
+          res.send("Login Success! " + "Welcome " + user + ", uid: " + req.session.id);
         } else {
           console.log("Attempt: " + req.body.password + " vs " + result[0].password);
           res.send("Login Failed. Wrong Password!");
