@@ -13,3 +13,9 @@
 10. Store / Access passwords / API keys from environment variable
 11. Clean up code
 12. Deploy on Docker / AWS
+
+## Description
+This web application fetches current stock information (price, news, price history).
+
+## Upcoming Features
+Add user accounts which will keep track of user's stocks and transactions. Then generate charts on user's net gain / loss.
