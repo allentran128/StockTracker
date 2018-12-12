@@ -1,7 +1,7 @@
 # Current Progress
 
 ## TODO
-1. Update passwords storage to SHA256 using bcrypt
+1. Update passwords storage to SHA256 using bcrypt [DONE]
 2. Redirect pages (login -> dashboard, register -> login, dashboard -> logout, etc)
 3. Host dev server for testing
 4. Implement Session (express-session or JWT)
