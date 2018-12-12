@@ -36,6 +36,7 @@
         const rep = req.responseText;
         console.log("I got a reply:");
         console.log(rep);
+        document.location.href = '../dashboard/user.html';
       };
 
       req.setRequestHeader("Content-Type", "application/json");

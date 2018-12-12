@@ -2,8 +2,6 @@
  *
  * TODO: Figure out how to Submit a form
  *
- *
- *
  */
 
 (function() {
@@ -24,6 +22,7 @@
           // success
           console.log("Registered");
           resolve("done");
+          document.location.href = '../dashboard/user.html';
         } else {
           // failed
           console.log("Failed to register");

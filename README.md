@@ -2,7 +2,10 @@
 
 ## TODO
 1. Update passwords storage to SHA256 using bcrypt [DONE]
-2. Redirect pages (login -> dashboard, register -> login, dashboard -> logout, etc)
+2. Redirect pages 
+    - login -> dashboard [DONE]
+    - register -> dashboard [DONE]
+    - dashboard -> logout []
 3. Host dev server for testing
 4. Implement Session (express-session or JWT)
 5. Handle invalid login / register cases (invalid email / password combo, invalid DB lookup, email already in use, etc)
