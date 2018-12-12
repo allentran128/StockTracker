@@ -1,8 +1,6 @@
 /* LOG IN FUNCTINALITY
  *
- * TODO: hash passwords with SHA256
  * TODO: have user send back a user.html page and have JS redirect there
- *
  *
  */
 
