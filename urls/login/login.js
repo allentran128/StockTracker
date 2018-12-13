@@ -34,9 +34,14 @@
 
       req.onreadystatechange = function() {
         const rep = req.responseText;
-        console.log("I got a reply:");
-        console.log(rep);
-        document.location.href = '../dashboard/user.html';
+        if (req.status == 200) {
+          console.log("YAY");
+          document.location.href = '../dashboard/user.html';
+        } else {
+          // Try again message
+          console.log("NAY");
+          document.getElementById("welcomeMsg").innerHTML = "Please Try Again";
+        }
       };
 
       req.setRequestHeader("Content-Type", "application/json");
