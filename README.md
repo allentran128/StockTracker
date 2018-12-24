@@ -1,6 +1,14 @@
-# Current Progress
+# Stock Tracker
+## Description
+This web application fetches current stock information (price, news, price history).
 
-## TODO
+## Upcoming Features
+Add user accounts which will keep track of user's stocks and transactions. Then generate charts on user's net gain / loss.
+
+## Local Development Web Server
+Go to urls/ folder. Then run 'python -m SimpleHTTPServer'. The server will be hosted at 'localhost:8000'.
+
+## Current Progress
 1. Update passwords storage to SHA256 using bcrypt [DONE]
 2. Redirect pages 
     - login -> dashboard [DONE]
@@ -19,12 +27,3 @@
 10. Store / Access passwords / API keys from environment variable
 11. Clean up code
 12. Deploy on Docker / AWS
-
-## Description
-This web application fetches current stock information (price, news, price history).
-
-## Upcoming Features
-Add user accounts which will keep track of user's stocks and transactions. Then generate charts on user's net gain / loss.
-
-## Local Development Web Server
-Go to urls/ folder. Then run 'python -m SimpleHTTPServer'. The server will be hosted at 'localhost:8000'.
